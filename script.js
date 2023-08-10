@@ -1,3 +1,10 @@
+const APP_VERSION = "1.0";
+
+if (localStorage.getItem("APP_VERSION") != APP_VERSION) {
+    localStorage.clear();
+    localStorage.setItem("APP_VERSION", APP_VERSION);
+}
+
 const cardTemplate = document.querySelector('#cardTemplate');
 const cardShelf = document.querySelector('#cardShelf');
 
@@ -152,11 +159,61 @@ function displayCards() {
 
         let card = document.importNode(cardTemplate.content, true);
         // character name
-        card.querySelector("[data=picture]").src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}.jpg`;
-        card.querySelector("[data=picture]").alt = cardInfos.character;
-        // character name + serie
-        card.querySelector("[data-info=fallbackPicture]").data = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}.jpg`;
-        card.querySelector("[data-info=fallbackPicture]").alt = cardInfos.character;
+        img = card.querySelector("[data=picture]");
+        img.setAttribute("data-code", cardInfos.code);
+        var defaultSrc = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
+        if (getCardCache(cardInfos.code)) {
+            defaultSrc = getCardCache(cardInfos.code);
+            img.setAttribute("data-img-stage", "cache");
+        } else {
+            setCardCache(cardInfos.code, defaultSrc);
+            img.setAttribute("data-img-stage", "versioned-full")
+        }
+        img.src = defaultSrc;
+        img.alt = cardInfos.character;
+        img.addEventListener("error", (event) => {
+            var eventImg = event.target;
+            switch (eventImg.getAttribute("data-img-stage")) {
+                case "cache":
+                    {
+                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
+                        eventImg.src = src;
+                        eventImg.setAttribute("data-img-stage", "full");
+                        setCardCache(eventImg.getAttribute("data-code"), src);
+                    }
+                    break;
+                case "versioned-full":
+                    {
+                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}.jpg`;
+                        eventImg.src = src;
+                        eventImg.setAttribute("data-img-stage", "full");
+                        setCardCache(eventImg.getAttribute("data-code"), src);
+                    }
+                    break;
+                case "full":
+                    {
+                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}-1.jpg`;
+                        eventImg.src = src;
+                        eventImg.setAttribute("data-img-stage", "versioned-name");
+                        setCardCache(eventImg.getAttribute("data-code"), src);
+                    }
+                    break;
+                case "versioned-name":
+                    {
+                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}.jpg`;
+                        eventImg.src = src;
+                        eventImg.setAttribute("data-img-stage", "name");
+                        setCardCache(eventImg.getAttribute("data-code"), src);
+                    }
+                    break;
+                case "name":
+                default:
+                    return;
+            }
+        })
+        // // character name + serie
+        // card.querySelector("[data-info=fallbackPicture]").data = 
+        // card.querySelector("[data-info=fallbackPicture]").alt = cardInfos.character;
 
         card.querySelector("[data=name]").innerText = cardInfos.character;
         card.querySelector("[data=serie]").innerText = cardInfos.series;
@@ -202,7 +259,8 @@ function displayCards() {
 
 const formatCharacterName = (name) => {
     return name.toLowerCase()
-        .replaceAll(" - ", " ")
+        .replaceAll("-", " ")
+        .replace(/^\s+|\s+$|\s+(?=\s)/g, "")
         .replaceAll(" ", "-")
         .replaceAll("(", "")
         .replaceAll(")", "")
@@ -212,5 +270,28 @@ const formatCharacterName = (name) => {
         .replaceAll(".", "")
         .replaceAll(",", "")
         .replaceAll("&", "")
-        .replaceAll("?", "")
+        .replaceAll("?", "");
+}
+
+const getCardCache = (code) => {
+    console.info("GET", code);
+    if (!localStorage.getItem("cards")) {
+        localStorage.setItem("cards", JSON.stringify({}));
+    }
+
+    let cards = JSON.parse(localStorage.getItem("cards"));
+    return cards[code];
+}
+
+
+
+const setCardCache = (code, src) => {    
+    console.info("SET", code, src);
+    if (!localStorage.getItem("cards")) {
+        localStorage.setItem("cards", JSON.stringify({}));
+    }
+
+    let cards = JSON.parse(localStorage.getItem("cards"));
+    cards[code] = src;
+    localStorage.setItem("cards", JSON.stringify(cards));
 }

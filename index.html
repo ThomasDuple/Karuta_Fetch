@@ -80,16 +80,16 @@
                         <div class="form-floating">
                             <select class="form-select" id="inputOrder" aria-label="Ordre">
                                 <option value="none">Aucun</option>
-                                <option value="date-asc">Date d'obtention ↓</option>
-                                <option value="date-desc">Date d'obtention ↑</option>
-                                <option value="gold-asc">Gold ↓</option>
+                                <option value="date-desc">Date d'obtention ↓</option>
+                                <option value="date-asc">Date d'obtention ↑</option>
+                                <option value="gold-desc">Gold ↓</option>
                                 <option value="gold-desc">Gold ↑</option>
                                 <option value="name-asc">Nom ↓</option>
-                                <option value="name-desc">Nom ↑</option>
-                                <option value="serie-asc">Serie ↓</option>
-                                <option value="serie-desc">Serie ↑</option>
-                                <option value="wishlist-asc">Wishlist ↓</option>
-                                <option value="wishlist-desc">Wishlist ↑</option>
+                                <option value="name-asc">Nom ↑</option>
+                                <option value="serie-desc">Serie ↓</option>
+                                <option value="serie-asc">Serie ↑</option>
+                                <option value="wishlist-desc">Wishlist ↓</option>
+                                <option value="wishlist-asc">Wishlist ↑</option>
                             </select>
                             <label for="inputOrder"><i class="bi bi-sort-down"></i> Ordre</label>
                         </div>
@@ -120,9 +120,7 @@
     <template id="cardTemplate">
         <div>
             <div class="card text-bg-light h-100">
-                <object data-info="fallbackPicture" class="card-img-top" alt="#character">
-                    <img data="picture" class="card-img-top" alt="#character">
-                </object>
+                <img data="picture" class="bg-dark text-light card-img-top d-flex" alt="#character" style="aspect-ratio: 13 / 18;">
                 <div class="card-body">
                     <div class="mb-3">
                         <span class="badge" data="quality">#quality</span>
