@@ -10,12 +10,26 @@
     <script src="./script.js" defer></script>
 </head>
 <body>
+    <script>
+        document.body.setAttribute("data-bs-theme", localStorage.getItem("theme") == "dark" ? "dark" : "light");
+    </script>
     <main class="container d-flex flex-column gap-4">
-        <header class="pb-3 my-4 border-bottom">
-            <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none">
-              <span class="fs-4"><i class="bi bi-grid-1x2-fill"></i> Karuta Fetch</span>
+        <header class="mt-3 border-bottom d-flex justify-content-between align-items-center flex-wrap">
+            <a href="/" class="d-flex align-items-center text-body-emphasis text-decoration-none mb-3">
+                <span class="fs-4"><i class="bi bi-grid-1x2-fill"></i> Karuta Fetch</span>
             </a>
-          </header>
+            <div class="form-check form-switch mb-3">
+                <input class="form-check-input" type="checkbox" role="switch" id="switchTheme">
+                <label class="form-check-label" for="switchTheme">Dark theme</label>
+            </div>
+            <script>
+                document.querySelector("#switchTheme").checked = localStorage.getItem("theme") == "dark";
+                document.querySelector("#switchTheme").addEventListener("change", () => {
+                    localStorage.setItem("theme", document.querySelector("#switchTheme").checked ? "dark" : "light");
+                    document.body.setAttribute("data-bs-theme", document.querySelector("#switchTheme").checked ? "dark" : "light");
+                })
+            </script>
+        </header>
         <section>
             <h3><i class="bi bi-file-earmark-arrow-up"></i> Fichier</h2>
             <div class="mb-2 col-auto">
@@ -119,14 +133,14 @@
 
     <template id="cardTemplate">
         <div>
-            <div class="card text-bg-light h-100">
-                <img data="picture" class="bg-dark text-light card-img-top d-flex" alt="#character" style="aspect-ratio: 13 / 18;">
+            <div class="card h-100">
+                <img data="picture" class="bg-secondary text-light card-img-top d-flex" alt="#character" style="aspect-ratio: 13 / 18;">
                 <div class="card-body">
                     <div class="mb-3">
                         <span class="badge" data="quality">#quality</span>
                         <span class="badge text-bg-info" data="edition">#edition</span>
-                        <span class="badge text-bg-dark" data="number">#number</span>
-                        <span class="badge text-bg-dark" style="cursor: pointer;" title="Copier le code" data="code">#code</span>
+                        <span class="badge text-bg-secondary" data="number">#number</span>
+                        <span class="badge text-bg-secondary" style="cursor: pointer;" title="Copier le code" data="code">#code</span>
                     </div>
                     <h5 class="card-title"><i class="bi bi-person"></i> <span data="name">#character</span></h5>
                     <h6 class="card-subtitle mb-2 text-body-secondary"><i class="bi bi-collection-play"></i> <span data="serie">#series</span></h6>
