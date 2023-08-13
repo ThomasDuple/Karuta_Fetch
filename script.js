@@ -127,6 +127,10 @@ function displayCards() {
                 return a.character.localeCompare(b.character);
             case "name-desc":
                 return b.character.localeCompare(a.character);
+            case "print-asc":
+                return a.number.localeCompare(b.number);
+            case "print-desc":
+                return b.number.localeCompare(a.number);
             case "serie-asc":
                 return a.series.localeCompare(b.series);
             case "serie-desc":
@@ -170,7 +174,7 @@ function displayCards() {
             img.setAttribute("data-img-stage", "versioned-full")
         }
         img.src = defaultSrc;
-        img.alt = cardInfos.character;
+        img.alt = `${cardInfos.character} (Edition ${cardInfos.edition})`;
         img.addEventListener("error", (event) => {
             var eventImg = event.target;
             switch (eventImg.getAttribute("data-img-stage")) {
