@@ -128,9 +128,9 @@ function displayCards() {
             case "name-desc":
                 return b.character.localeCompare(a.character);
             case "print-asc":
-                return a.number.localeCompare(b.number);
+                return a.number - b.number;
             case "print-desc":
-                return b.number.localeCompare(a.number);
+                return b.number - a.number;
             case "serie-asc":
                 return a.series.localeCompare(b.series);
             case "serie-desc":
