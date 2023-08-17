@@ -19,6 +19,7 @@ let cards = [];
 let listSeries = [];
 let listTags = [];
 let tagCount = {};
+let selectedCards = [];
 
 const copyNotification = document.getElementById('copyNotification')
 const bootstrapNotification = bootstrap.Toast.getOrCreateInstance(copyNotification)
@@ -103,6 +104,7 @@ function readCSVFile() {
             document.querySelector("#filters").classList.remove("d-none")
 
             displayCards();
+            addEventListeners();
         };
     } else {
         alert("Selectionnez un fichier");
@@ -255,10 +257,25 @@ function displayCards() {
         card.querySelector("[data=wishlist]").innerText = cardInfos.wishlists;
         card.querySelector("[data=value]").innerText = cardInfos.burnValue;
         card.querySelector("[data=obtention]").innerText = new Date(parseInt(cardInfos.obtainedTimestamp)).toLocaleString();
-        cardShelf.appendChild(card);
 
+       card = cardShelf.appendChild(card);
     });
+
+  
     return false;
+}
+
+function addEventListeners() {
+    document.querySelectorAll(".card").forEach(card => {
+        let code = card.querySelector("[data=code]").innerText
+        card.addEventListener("click", () => {
+            console.log("click")
+            card.classList.toggle("border-primary");
+            card.classList.toggle("border-5");
+            selectedCards.push(code);
+            })
+            console.log(code)
+    });
 }
 
 const formatCharacterName = (name) => {
@@ -278,7 +295,6 @@ const formatCharacterName = (name) => {
 }
 
 const getCardCache = (code) => {
-    console.info("GET", code);
     if (!localStorage.getItem("cards")) {
         localStorage.setItem("cards", JSON.stringify({}));
     }
@@ -290,7 +306,6 @@ const getCardCache = (code) => {
 
 
 const setCardCache = (code, src) => {    
-    console.info("SET", code, src);
     if (!localStorage.getItem("cards")) {
         localStorage.setItem("cards", JSON.stringify({}));
     }
