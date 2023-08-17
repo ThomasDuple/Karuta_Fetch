@@ -278,6 +278,21 @@ function addEventListeners() {
     });
 }
 
+function unselectAllCards() {
+    document.querySelectorAll(".card").forEach(card => {
+        card.classList.remove("border-primary");
+        card.classList.remove("border-5");
+    });
+    selectedCards = [];
+}
+
+function copyCardCode(code) {
+    let text = selectedCards.join(" ") 
+    navigator.clipboard.writeText(text);
+    bootstrapNotification.show();
+}
+
+
 const formatCharacterName = (name) => {
     return name.toLowerCase()
         .replaceAll("-", " ")
