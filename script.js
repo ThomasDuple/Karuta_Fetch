@@ -324,6 +324,15 @@ const selectCard = (code) => {
     let card = document.querySelector(`[data-card=${code}]`);
     card.classList.add("bg-primary");
     card.classList.add("text-white");
+    card.querySelectorAll(".badge").forEach((badge) => {
+        badge.classList.add("bg-light");
+        badge.classList.add("text-primary");
+    })
+    card.querySelectorAll(".list-group-item").forEach((badge) => {
+        badge.classList.add("text-light");
+    })
+    card.querySelector(".card-subtitle").classList.remove("text-body-secondary");
+    card.querySelector(".card-footer").classList.remove("text-body-secondary");
     document.querySelector("#btnCopy").disabled = false;
     document.querySelector("#btnUnselect").disabled = false;
 }
@@ -333,6 +342,15 @@ const unselectCard = (code) => {
     let card = document.querySelector(`[data-card=${code}]`);
     card.classList.remove("bg-primary");
     card.classList.remove("text-white");
+    card.querySelectorAll(".badge").forEach((badge) => {
+        badge.classList.remove("bg-light");
+        badge.classList.remove("text-primary");
+    })
+    card.querySelectorAll(".list-group-item").forEach((badge) => {
+        badge.classList.remove("text-light");
+    })
+    card.querySelector(".card-subtitle").classList.add("text-body-secondary");
+    card.querySelector(".card-footer").classList.add("text-body-secondary");
     if (selectedCards.length == 0) {
         document.querySelector("#btnCopy").disabled = true;
         document.querySelector("#btnUnselect").disabled = true;
