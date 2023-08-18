@@ -321,6 +321,7 @@ const setCardCache = (code, src) => {
 
 const selectCard = (code) => {
     selectedCards.push(code);
+    updateSelectionCount();
     let card = document.querySelector(`[data-card=${code}]`);
     card.classList.add("bg-primary");
     card.classList.add("text-white");
@@ -339,6 +340,7 @@ const selectCard = (code) => {
 
 const unselectCard = (code) => {
     selectedCards.splice(selectedCards.indexOf(code), 1);
+    updateSelectionCount();
     let card = document.querySelector(`[data-card=${code}]`);
     card.classList.remove("bg-primary");
     card.classList.remove("text-white");
@@ -364,12 +366,32 @@ const unselectAllCards = () => {
     });
 }
 
+const updateSelectionCount = () => {
+    let selectionCount = document.querySelector("#selectionCount");
+    if (selectionActivated) {
+        switch (selectedCards.length) {
+            case 0:
+                selectionCount.innerText = "Aucune carte sélectionnée";
+                return;
+            case 1:
+                selectionCount.innerText = "1 carte sélectionnée";
+                return;
+            default:
+                selectionCount.innerText = selectedCards.length + " cartes sélectionnées";
+                return;
+        }
+    } else {
+        selectionCount.innerText = "Sélection désactivée";
+    }
+}
+
 document.querySelector("#switchSelection").addEventListener("change", (event) => {
     const value = event.target.checked;
     selectionActivated = value;
     if (!value) {
         unselectAllCards();
     }
+    updateSelectionCount();
 })
 
 const copyCodes = () => {
