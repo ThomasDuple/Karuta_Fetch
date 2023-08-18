@@ -1,4 +1,4 @@
-const APP_VERSION = "1.0";
+const APP_VERSION = "1.1";
 
 if (localStorage.getItem("APP_VERSION") != APP_VERSION) {
     localStorage.clear();
@@ -23,8 +23,12 @@ let tagCount = {};
 const copyNotification = document.getElementById('copyNotification')
 const bootstrapNotification = bootstrap.Toast.getOrCreateInstance(copyNotification)
 
+let selectionActivated = false;
+let selectedCards = [];
+
 function copyCardCode(cardCode) {
     navigator.clipboard.writeText(cardCode);
+    document.querySelector("#notificationText").innerText = "Le code a été copié dans le presse papier";
     bootstrapNotification.show()
 }
 
@@ -99,8 +103,8 @@ function readCSVFile() {
                 inputTag.appendChild(option);
             });
 
-            document.querySelector("#showCardsBtn").classList.remove("d-none")
             document.querySelector("#filters").classList.remove("d-none")
+            document.querySelector("#selection").classList.remove("d-none")
 
             displayCards();
         };
@@ -162,8 +166,19 @@ function displayCards() {
         }
 
         let card = document.importNode(cardTemplate.content, true);
+        let cardSection = card.querySelector("[data=card]");
+        cardSection.setAttribute("data-card", cardInfos.code);
+        cardSection.addEventListener("click", (event) => {
+            if (selectionActivated) {
+                if (!selectedCards.includes(cardInfos.code)) {
+                    selectCard(cardInfos.code);
+                } else {
+                    unselectCard(cardInfos.code);
+                }
+            }
+        });
         // character name
-        img = card.querySelector("[data=picture]");
+        let img = card.querySelector("[data=picture]");
         img.setAttribute("data-code", cardInfos.code);
         var defaultSrc = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
         if (getCardCache(cardInfos.code)) {
@@ -211,13 +226,16 @@ function displayCards() {
                     }
                     break;
                 case "name":
+                    {
+                        const src = `./not-found.png`;
+                        eventImg.src = src;
+                        eventImg.setAttribute("data-img-stage", "none");
+                        setCardCache(eventImg.getAttribute("data-code"), src);
+                    }
                 default:
                     return;
             }
         })
-        // // character name + serie
-        // card.querySelector("[data-info=fallbackPicture]").data = 
-        // card.querySelector("[data-info=fallbackPicture]").alt = cardInfos.character;
 
         card.querySelector("[data=name]").innerText = cardInfos.character;
         card.querySelector("[data=serie]").innerText = cardInfos.series;
@@ -250,7 +268,12 @@ function displayCards() {
         card.querySelector("[data=edition]").innerText = "◈" + cardInfos.edition + " (Edition)";
         card.querySelector("[data=number]").innerText = "#" + cardInfos.number + " (Print)";
         card.querySelector("[data=code]").innerText = cardInfos.code;
-        card.querySelector("[data=code]").addEventListener("click", () => copyCardCode(cardInfos.code));
+        card.querySelector("[data=code]").addEventListener("click", () => {
+            if (selectionActivated) {
+                return;
+            }
+            copyCardCode(cardInfos.code);
+        });
         card.querySelector("[data=tag]").innerText = cardInfos.tag == "" ? "None" : cardInfos.tag;
         card.querySelector("[data=wishlist]").innerText = cardInfos.wishlists;
         card.querySelector("[data=value]").innerText = cardInfos.burnValue;
@@ -278,7 +301,6 @@ const formatCharacterName = (name) => {
 }
 
 const getCardCache = (code) => {
-    console.info("GET", code);
     if (!localStorage.getItem("cards")) {
         localStorage.setItem("cards", JSON.stringify({}));
     }
@@ -287,10 +309,7 @@ const getCardCache = (code) => {
     return cards[code];
 }
 
-
-
-const setCardCache = (code, src) => {    
-    console.info("SET", code, src);
+const setCardCache = (code, src) => {
     if (!localStorage.getItem("cards")) {
         localStorage.setItem("cards", JSON.stringify({}));
     }
@@ -299,3 +318,44 @@ const setCardCache = (code, src) => {
     cards[code] = src;
     localStorage.setItem("cards", JSON.stringify(cards));
 }
+
+const selectCard = (code) => {
+    selectedCards.push(code);
+    let card = document.querySelector(`[data-card=${code}]`);
+    card.classList.add("bg-primary");
+    card.classList.add("text-white");
+    document.querySelector("#btnCopy").disabled = false;
+    document.querySelector("#btnUnselect").disabled = false;
+}
+
+const unselectCard = (code) => {
+    selectedCards.splice(selectedCards.indexOf(code), 1);
+    let card = document.querySelector(`[data-card=${code}]`);
+    card.classList.remove("bg-primary");
+    card.classList.remove("text-white");
+    if (selectedCards.length == 0) {
+        document.querySelector("#btnCopy").disabled = true;
+        document.querySelector("#btnUnselect").disabled = true;
+    }
+}
+
+const unselectAllCards = () => {
+    const currentSelectedCards = [...selectedCards];
+    currentSelectedCards.forEach((code) => {
+        unselectCard(code);
+    });
+}
+
+document.querySelector("#switchSelection").addEventListener("change", (event) => {
+    const value = event.target.checked;
+    selectionActivated = value;
+    if (!value) {
+        unselectAllCards();
+    }
+})
+
+const copyCodes = () => {
+    navigator.clipboard.writeText(selectedCards.join(", "));
+    document.querySelector("#notificationText").innerText = "Les codes ont été copiés dans le presse papier";
+    bootstrapNotification.show()
+};
