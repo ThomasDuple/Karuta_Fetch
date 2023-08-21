@@ -15,6 +15,8 @@ const inputEdition = document.querySelector("#inputEdition");
 const inputQuality = document.querySelector("#inputQuality");
 const inputTag = document.querySelector("#inputTag");
 
+const IMG_SERVER = "https://d2l56h9h5tj8ue.cloudfront.net/images/cards";
+
 let cards = [];
 let listSeries = [];
 let listTags = [];
@@ -123,6 +125,10 @@ function displayCards() {
                 return a.obtainedTimestamp - b.obtainedTimestamp;
             case "date-desc":
                 return b.obtainedTimestamp - a.obtainedTimestamp;
+            case "effort-asc":
+                return a["worker.effort"] - b["worker.effort"];
+            case "effort-desc":
+                return b["worker.effort"] - a["worker.effort"];
             case "gold-asc":
                 return a.burnValue - b.burnValue;
             case "gold-desc":
@@ -180,7 +186,7 @@ function displayCards() {
         // character name
         let img = card.querySelector("[data=picture]");
         img.setAttribute("data-code", cardInfos.code);
-        var defaultSrc = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
+        var defaultSrc = `${IMG_SERVER}/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
         if (getCardCache(cardInfos.code)) {
             defaultSrc = getCardCache(cardInfos.code);
             img.setAttribute("data-img-stage", "cache");
@@ -195,7 +201,7 @@ function displayCards() {
             switch (eventImg.getAttribute("data-img-stage")) {
                 case "cache":
                     {
-                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
+                        const src = `${IMG_SERVER}/versioned/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}-1.jpg`;
                         eventImg.src = src;
                         eventImg.setAttribute("data-img-stage", "full");
                         setCardCache(eventImg.getAttribute("data-code"), src);
@@ -203,7 +209,7 @@ function displayCards() {
                     break;
                 case "versioned-full":
                     {
-                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}.jpg`;
+                        const src = `${IMG_SERVER}/${formatCharacterName(cardInfos.character + " " + cardInfos.series)}-${cardInfos.edition}.jpg`;
                         eventImg.src = src;
                         eventImg.setAttribute("data-img-stage", "full");
                         setCardCache(eventImg.getAttribute("data-code"), src);
@@ -211,7 +217,7 @@ function displayCards() {
                     break;
                 case "full":
                     {
-                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/versioned/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}-1.jpg`;
+                        const src = `${IMG_SERVER}/versioned/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}-1.jpg`;
                         eventImg.src = src;
                         eventImg.setAttribute("data-img-stage", "versioned-name");
                         setCardCache(eventImg.getAttribute("data-code"), src);
@@ -219,7 +225,7 @@ function displayCards() {
                     break;
                 case "versioned-name":
                     {
-                        const src = `https://d2l56h9h5tj8ue.cloudfront.net/images/cards/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}.jpg`;
+                        const src = `${IMG_SERVER}/${formatCharacterName(cardInfos.character)}-${cardInfos.edition}.jpg`;
                         eventImg.src = src;
                         eventImg.setAttribute("data-img-stage", "name");
                         setCardCache(eventImg.getAttribute("data-code"), src);
@@ -277,6 +283,7 @@ function displayCards() {
         card.querySelector("[data=tag]").innerText = cardInfos.tag == "" ? "None" : cardInfos.tag;
         card.querySelector("[data=wishlist]").innerText = cardInfos.wishlists;
         card.querySelector("[data=value]").innerText = cardInfos.burnValue;
+        card.querySelector("[data=effort]").innerText = !cardInfos["worker.recoveryTimestamp"] ? cardInfos["worker.effort"] : `${cardInfos['worker.effort']} (Injured until ${new Date(parseInt(cardInfos['worker.recoveryTimestamp'])).toLocaleString()})`;
         card.querySelector("[data=obtention]").innerText = new Date(parseInt(cardInfos.obtainedTimestamp)).toLocaleString();
         cardShelf.appendChild(card);
 
